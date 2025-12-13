@@ -1,10 +1,21 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env python3
+import sys
+import time
+import random
 
-# Example backend wrapper for Kiro CLI.
-# Reads prompt from stdin, prints model output to stdout.
-#
-# Install/configure Kiro separately. If you get instant timeouts:
-#   kiro-cli settings api.timeout 300000
+# KIRO DEV WRAPPER (Free Tier)
+# Fast, concise, reads stdin -> stdout.
 
-kiro-cli chat --no-interactive --wrap never
+def main():
+    # 1. Read input
+    incoming_msg = sys.stdin.read().strip()
+
+    # 2. No sleep, Kiro is fast (and maybe cuts corners)
+    # Just a tiny micro-latency
+    time.sleep(random.uniform(0.05, 0.2))
+    
+    # 3. Output response
+    print(f"kiro@free-tier: Got it. '{incoming_msg}' processed. Waiting for next cmd.")
+
+if __name__ == "__main__":
+    main()

@@ -37,6 +37,10 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     status.add_argument("--status", default=None, help="Filter status (queued/leased/done/failed)")
     status.add_argument("--limit", type=int, default=50)
 
+    stats = sub.add_parser("stats", help="Show aggregated stats")
+    stats.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
+    stats.add_argument("--port", type=int, default=int(os.environ.get("MITTELO_PORT", "8765")))
+
     agent = sub.add_parser("agent", help="Run an agent that leases and executes tasks")
     agent.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
     agent.add_argument("--port", type=int, default=int(os.environ.get("MITTELO_PORT", "8765")))
@@ -102,6 +106,13 @@ def _cmd_status(args: argparse.Namespace) -> int:
     with JsonlClient(args.host, args.port) as c:
         res = c.call("list", {"status": args.status, "limit": args.limit})
     print(json.dumps(res, indent=2, ensure_ascii=False))
+    return 0
+
+
+def _cmd_stats(args: argparse.Namespace) -> int:
+    with JsonlClient(args.host, args.port) as c:
+        res = c.call("stats", {})
+    print(json.dumps(res["stats"], indent=2, ensure_ascii=False))
     return 0
 
 
@@ -182,6 +193,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_enqueue(args)
     if args.cmd == "status":
         return _cmd_status(args)
+    if args.cmd == "stats":
+        return _cmd_stats(args)
     if args.cmd == "agent":
         return _cmd_agent(args)
     if args.cmd == "swarm":
