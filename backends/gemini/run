@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Example backend wrapper for Gemini CLI.
+# Install: npm/node + npx.
+
+npx -y @google/gemini-cli@nightly chat

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Example wrapper for a local open model CLI.
+# Replace this with the actual command you use (llama.cpp, lmstudio, etc).
+
+echo "opencode backend not configured" 1>&2
+exit 2

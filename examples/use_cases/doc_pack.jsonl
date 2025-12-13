@@ -1,0 +1,2 @@
+{"prompt":"Write a short README for a tiny Python project that has a TCP hub and pluggable agents."}
+{"prompt":"Draft a CONTRIBUTING.md section explaining how to add a new backend wrapper that reads stdin and writes stdout."}

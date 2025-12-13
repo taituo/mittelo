@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# 1) read prompt
+prompt="$(cat)"
+
+# 2) do work (replace this)
+printf "template:%s\n" "$prompt"

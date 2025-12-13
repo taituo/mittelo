@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Example backend wrapper for Kiro CLI.
+# Reads prompt from stdin, prints model output to stdout.
+#
+# Install/configure Kiro separately. If you get instant timeouts:
+#   kiro-cli settings api.timeout 300000
+
+kiro-cli chat --no-interactive --wrap never

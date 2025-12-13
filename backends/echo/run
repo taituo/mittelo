@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+prompt="$(cat)"
+printf "echo:%s\n" "$prompt"

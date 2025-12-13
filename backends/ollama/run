@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Example backend wrapper for Ollama.
+# Install Ollama and pick a model you have locally.
+
+ollama run llama3.1

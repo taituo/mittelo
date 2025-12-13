@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Placeholder for a Codex-style CLI backend wrapper.
+# Fill in the command you want to use (or replace this file).
+
+echo "codex backend not configured" 1>&2
+exit 2

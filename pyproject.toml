@@ -1,0 +1,10 @@
+[project]
+name = "mittelo"
+version = "0.1.0"
+description = "Mittelö SwarmKit: hub + agents + pluggable backends (codex/gemini/kiro/local LLMs)"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[project.scripts]
+mittelo = "mittelo.__main__:main"

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Example wrapper for Claude Code.
+# Replace the command to match your local setup.
+#
+# Contract:
+# - reads prompt from stdin
+# - prints answer to stdout
+
+prompt="$(cat)"
+printf "%s" "$prompt" | claude --print
