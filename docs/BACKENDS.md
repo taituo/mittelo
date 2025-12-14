@@ -22,6 +22,15 @@ python3 -m mittelo agent --backend claude_code --once
 # claude "hello" --print --tools "" --model ...
 ```
 
+### GLM (via Claude Code endpoints)
+
+If your `claude` CLI is configured (via env exports) to talk to GLM-compatible endpoints, you can use the `glm` backend alias:
+
+```bash
+# Configure Claude Code to use your GLM endpoints (env exports, per your setup)
+python3 -m mittelo agent --backend glm --once
+```
+
 ### Kiro CLI
 ```bash
 export MITTELO_KIRO_MODEL="haiku"
