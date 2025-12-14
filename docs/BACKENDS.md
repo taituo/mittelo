@@ -6,7 +6,13 @@ Mittelö agents can use any "backend" that turns a **prompt → stdout**.
 
 Use these commands to verify backends in isolation (no hub required).
 
+Tip: run a quick prereq check first:
+```bash
+python3 -m mittelo backend-check --backend <name>
+```
+
 ### Gemini
+**Prereqs:** `gemini` (or `npx`) available; auth via `GEMINI_API_KEY` or `~/.gemini/settings.json`.
 ```bash
 export MITTELO_GEMINI_MODEL="gemini-2.0-flash-exp"
 python3 -m mittelo agent --backend gemini --once
@@ -15,6 +21,7 @@ python3 -m mittelo agent --backend gemini --once
 ```
 
 ### Claude Code
+**Prereqs:** `claude` available; logged in (Claude may prompt `/login` on first use).
 ```bash
 export MITTELO_CLAUDE_MODEL="claude-3-5-sonnet-20241022"
 python3 -m mittelo agent --backend claude_code --once
@@ -32,6 +39,7 @@ python3 -m mittelo agent --backend glm --once
 ```
 
 ### Kiro CLI
+**Prereqs:** `kiro-cli` available; may require device-flow login (`kiro-cli login --use-device-flow`).
 ```bash
 export MITTELO_KIRO_MODEL="haiku"
 python3 -m mittelo agent --backend kiro --once
@@ -40,6 +48,7 @@ python3 -m mittelo agent --backend kiro --once
 ```
 
 ### Codex CLI
+**Prereqs:** `codex` available; authenticated.
 ```bash
 export MITTELO_CODEX_MODEL="gpt-4o"
 python3 -m mittelo agent --backend codex --once
@@ -48,6 +57,7 @@ python3 -m mittelo agent --backend codex --once
 ```
 
 ### MLX (Apple Silicon)
+**Prereqs:** `mlx-lm` installed in the same Python env used to run the agent.
 ```bash
 # Requires mlx-lm installed
 export MITTELO_MLX_MODEL="mlx-community/Qwen2.5-1.5B-Instruct-4bit"
@@ -56,6 +66,7 @@ python3 -m mittelo agent --backend mlx --once
 
 ### Kimi CLI (example)
 
+**Prereqs:** `kimi` available; may require API key/model config (varies by install).
 ```bash
 export MITTELO_KIMI_MODEL="kimi-for-coding"
 # For Kimi2 models, set MITTELO_KIMI_MODEL=kimi2-... (per your account/CLI)

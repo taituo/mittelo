@@ -8,11 +8,10 @@ from textual.reactive import reactive
 from textual.binding import Binding
 from rich.text import Text
 
-# Import Client (adjust path as needed)
 import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
-from src.wrapper.client import JsonlClient
+from src.utils.dashboard_snapshot import fetch_dashboard_snapshot
 
 # Load Small Logo
 LOGO_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "assets", "logo_small.ansi"))
@@ -174,47 +173,43 @@ class MitteloDash(App):
         self.update_stats()
 
     def update_stats(self) -> None:
-        try:
-            with JsonlClient(self.host, self.port, timeout_s=1.0) as c:
-                resp_stats = c.call("stats", {})
-                s = resp_stats.get("stats", {})
-                
-                self.query_one("#stat-queued", StatBox).value = s.get("queued", 0)
-                self.query_one("#stat-leased", StatBox).value = s.get("leased", 0)
-                self.query_one("#stat-done", StatBox).value = s.get("done", 0)
-                self.query_one("#stat-failed", StatBox).value = s.get("failed", 0)
-                
-                self.connected = True
-                self.query_one("#stat-status", StatBox).value = "ONLINE"
-                self.query_one("#stat-status", StatBox).digits.styles.color = "#00ff00"
+        snap = fetch_dashboard_snapshot(self.host, self.port, timeout_s=1.0, limit=20)
+        if snap.online:
+            s = snap.stats
 
-                resp_list = c.call("list", {"limit": 20})
-                tasks = resp_list.get("tasks", [])
-                
-                self.table.clear()
-                for t in tasks:
-                    t_id = str(t["task_id"])
-                    status = t["status"]
-                    prompt = t["prompt"][:50].replace("\n", " ") + "..."
-                    worker = (t["worker_id"] or "-").split("-")[1] if "-" in (t["worker_id"] or "") else "-"
-                    result = (t["result"] or "")[:50].replace("\n", " ") + "..."
-                    
-                    if status == "done": 
-                        status_styled = "[bold green]✔ DONE[/]"
-                    elif status == "failed": 
-                        status_styled = "[bold red]✘ FAIL[/]"
-                    elif status == "leased": 
-                        status_styled = "[bold cyan]⟳ RUN [/]"
-                    elif status == "queued": 
-                        status_styled = "[bold yellow]● WAIT[/]"
-                    else:
-                        status_styled = status
+            self.query_one("#stat-queued", StatBox).value = s.get("queued", 0)
+            self.query_one("#stat-leased", StatBox).value = s.get("leased", 0)
+            self.query_one("#stat-done", StatBox).value = s.get("done", 0)
+            self.query_one("#stat-failed", StatBox).value = s.get("failed", 0)
 
-                    self.table.add_row(t_id, status_styled, prompt, worker, result)
+            self.connected = True
+            self.query_one("#stat-status", StatBox).value = "ONLINE"
+            self.query_one("#stat-status", StatBox).digits.styles.color = "#00ff00"
 
-        except Exception as e:
+            tasks = snap.tasks
+            self.table.clear()
+            for t in tasks:
+                t_id = str(t["task_id"])
+                status = t["status"]
+                prompt = t["prompt"][:50].replace("\n", " ") + "..."
+                worker = (t["worker_id"] or "-").split("-")[1] if "-" in (t["worker_id"] or "") else "-"
+                result = (t["result"] or "")[:50].replace("\n", " ") + "..."
+
+                if status == "done":
+                    status_styled = "[bold green]✔ DONE[/]"
+                elif status == "failed":
+                    status_styled = "[bold red]✘ FAIL[/]"
+                elif status == "leased":
+                    status_styled = "[bold cyan]⟳ RUN [/]"
+                elif status == "queued":
+                    status_styled = "[bold yellow]● WAIT[/]"
+                else:
+                    status_styled = status
+
+                self.table.add_row(t_id, status_styled, prompt, worker, result)
+        else:
             self.connected = False
-            self.sub_title = f"Error: {e}"
+            self.sub_title = f"Error: {snap.error}"
             self.query_one("#stat-status", StatBox).value = "OFFLINE"
             self.query_one("#stat-status", StatBox).digits.styles.color = "#ff0000"
 
