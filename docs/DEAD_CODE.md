@@ -32,7 +32,7 @@ vulture src mittelo scripts --min-confidence 80
 - **Can we use it?** yes, as reference or for resurrecting older backends.
 - **Action:** keep under `backends/archive/` to avoid confusion in main backends list.
 
-### Developer scripts (`scripts/verify_*.py`, `scripts/debug_codex.py`, `scripts/img2ansi.py`)
+### Developer scripts (`scripts/verify_*.py`, `scripts/archive/*`, `scripts/img2ansi.py`)
 
 - **Status:** “tooling code” (not used by hub/agent runtime).
 - **Can we use it?** yes; these are intentionally runnable utilities.
