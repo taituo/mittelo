@@ -32,7 +32,6 @@ class KiroCLIDriver(AbstractDriver):
             work_dir = str(Path.cwd() / ".mittelo" / "work" / "kiro")
         if work_dir:
             Path(work_dir).mkdir(parents=True, exist_ok=True)
-            cmd.extend(["--work-dir", work_dir])
 
         if self.trust_all_tools:
             cmd.append("--trust-all-tools")
