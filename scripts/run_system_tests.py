@@ -12,19 +12,15 @@ from pathlib import Path
 
 os.environ.setdefault("PYTHONDONTWRITEBYTECODE", "1")
 
+sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
+
+from wrapper.backends import resolve_backend_argv  # noqa: E402
+
 
 def _run_backend(backend: str, prompt: str) -> dict[str, object]:
-    run_path = Path("backends") / backend / "run"
-    if not run_path.exists():
-        return {"backend": backend, "ok": False, "error": f"backend not found: {run_path}"}
-
-    argv = [str(run_path)]
-    try:
-        first = run_path.read_text(encoding="utf-8", errors="replace").splitlines()[:1]
-        if first and first[0].startswith("#!") and "python" in first[0]:
-            argv = [sys.executable, str(run_path)]
-    except Exception:
-        pass
+    argv = resolve_backend_argv(backend)
+    if not argv:
+        return {"backend": backend, "ok": False, "error": f"backend not found: backends/{backend}/run"}
 
     # Redirect external CLI home/config into the run artifact folder (best-effort).
     # This avoids failures in sandboxed environments where writing to the real HOME is blocked.

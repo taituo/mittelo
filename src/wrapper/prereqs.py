@@ -43,7 +43,9 @@ def _home_candidates() -> list[Path]:
     candidates: list[Path] = []
     sp_home = os.environ.get("MITTELO_SUBPROCESS_HOME")
     if sp_home:
-        candidates.append(Path(sp_home))
+        # When we intentionally sandbox subprocess HOME, treat it as authoritative.
+        # This makes preflight checks match the environment the external CLI will see.
+        return [Path(sp_home)]
     home = os.environ.get("HOME")
     if home:
         candidates.append(Path(home))
@@ -71,16 +73,10 @@ def preflight_backend(backend: str) -> PreflightResult:
         if not _which_any("gemini", "npx"):
             problems.append("Gemini CLI not found (need `gemini` or `npx`).")
 
-        if not (
-            os.environ.get("GEMINI_API_KEY")
-            or os.environ.get("GOOGLE_GENAI_USE_VERTEXAI")
-            or os.environ.get("GOOGLE_GENAI_USE_GCA")
-        ):
-            has_settings = any((h / ".gemini" / "settings.json").exists() for h in _home_candidates())
-            if not has_settings:
-                warnings.append(
-                    "Gemini auth not detected (set GEMINI_API_KEY or configure ~/.gemini/settings.json)."
-                )
+        has_auth = bool(os.environ.get("GEMINI_API_KEY"))
+        has_settings = any((h / ".gemini" / "settings.json").exists() for h in _home_candidates())
+        if not (has_auth or has_settings):
+            warnings.append("Gemini auth not detected (set GEMINI_API_KEY or configure ~/.gemini/settings.json).")
 
     elif backend in {"claude_code", "glm"}:
         if not _which_any("claude"):
@@ -102,8 +98,8 @@ def preflight_backend(backend: str) -> PreflightResult:
         if not _which_any("kimi"):
             problems.append("Kimi CLI not found (need `kimi`).")
         has_key = bool(os.environ.get("KIMI_API_KEY"))
-        token_file = Path(os.path.expanduser("~/.ssh/kimi.token"))
-        if not has_key and not token_file.exists():
+        token_found = any((h / ".ssh" / "kimi.token").exists() for h in _home_candidates())
+        if not has_key and not token_found:
             warnings.append("KIMI_API_KEY not set and ~/.ssh/kimi.token not found (Kimi may fail to run).")
 
     elif backend == "tmux":

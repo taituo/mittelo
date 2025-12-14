@@ -32,15 +32,27 @@ def _run(argv: list[str]) -> tuple[int, str]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--core", action="store_true", help="Only check core Python/tooling (CI-friendly).")
     args = ap.parse_args(argv)
 
-    checks: list[Check] = [
-        Check("codex", ["codex", "--version"], ["codex", "exec", "--help"], ["--full-auto", "--sandbox"]),
-        Check("claude", ["claude", "--version"], ["claude", "--help"], ["--print"]),
-        Check("kiro-cli", ["kiro-cli", "--version"], ["kiro-cli", "chat", "--help"], ["--no-interactive"]),
-        Check("kimi", ["kimi", "--version"], ["kimi", "--help"], ["--print"]),
-        Check("npx", ["npx", "--version"]),
-    ]
+    if args.core:
+        checks = [
+            Check("python", [sys.executable, "--version"]),
+            Check("mittelo", [sys.executable, "-m", "mittelo", "--help"], required_substrings=["hub", "agent", "swarm"]),
+            Check(
+                "echo-backend",
+                [sys.executable, "-m", "mittelo", "backend-check", "--backend", "echo"],
+                required_substrings=["status: ok"],
+            ),
+        ]
+    else:
+        checks = [
+            Check("codex", ["codex", "--version"], ["codex", "exec", "--help"], ["--full-auto", "--sandbox"]),
+            Check("claude", ["claude", "--version"], ["claude", "--help"], ["--print"]),
+            Check("kiro-cli", ["kiro-cli", "--version"], ["kiro-cli", "chat", "--help"], ["--no-interactive"]),
+            Check("kimi", ["kimi", "--version"], ["kimi", "--help"], ["--print"]),
+            Check("npx", ["npx", "--version"]),
+        ]
 
     report: dict[str, object] = {"ok": True, "checks": []}
     for c in checks:
@@ -57,6 +69,11 @@ def main(argv: list[str] | None = None) -> int:
                 item["missing_flags"] = missing
                 if missing:
                     ok = False
+        elif c.required_substrings:
+            missing = [s for s in c.required_substrings if s not in ver_out]
+            item["missing_flags"] = missing
+            if missing:
+                ok = False
         if code != 0:
             ok = False
         item["ok"] = ok
