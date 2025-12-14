@@ -1,6 +1,12 @@
 # Mittelö Project TODO
 
-## 1. Cloud Readiness (Priority: High)
+## 0. Stability first (Priority: High)
+- [ ] **Backend determinism:** Verify each backend in *solo mode* before mixed swarms (US-B1/B2/B3).
+- [ ] **Version lock:** Record known-good CLI versions + non-interactive flags in `docs/VERSION_LOCK.md`.
+- [ ] **Protocol drift:** Keep `docs/PROTOCOL.md` aligned with hub methods (`retry_failed` etc).
+- [ ] **System runs as artifacts:** Add a system-test runner that writes `reports/e2e/*` instead of flaky pass/fail.
+
+## 1. Cloud Readiness (Priority: Medium)
 - [ ] **Dockerization:** Create `Dockerfile` for Hub and Agent images.
 - [ ] **Orchestration:** Create `docker-compose.yml` for easy local swarm spinning.
 - [ ] **Configuration:** Move hardcoded defaults (ports, hosts) to `.env` file support.
@@ -30,3 +36,4 @@
 ## 6. Documentation
 - [ ] **Tutorial:** "Zero to Swarm" guide using Docker.
 - [ ] **API Reference:** Auto-generated docs for `JsonlClient`.
+- [ ] **Feature bundles:** Keep stories + docs + tests together (`docs/FEATURE_BUNDLES.md`).

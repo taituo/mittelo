@@ -40,7 +40,7 @@
 
 ## Next Steps (from TODO.md - Priority: High)
 - **Cloud Readiness:** Dockerization of Hub and Agents.
-- **Real Backend Integration:** Start with `gh copilot` as a CLI wrapper since `gh` is available.
+- **Real Backend Integration:** (Removed) GH Copilot wrapper idea was experimental and has been removed.
 - **Protocol Extension:** Define structured JSON output for results, not just strings.
 
 This session has significantly advanced the Mittelö project's foundation and strategic direction.

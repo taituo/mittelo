@@ -1,12 +1,27 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env python3
+import sys
+import os
+import asyncio
 
-# Example wrapper for Claude Code.
-# Replace the command to match your local setup.
-#
-# Contract:
-# - reads prompt from stdin
-# - prints answer to stdout
+# Path fix
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, os.path.join(project_root, "src"))
 
-prompt="$(cat)"
-printf "%s" "$prompt" | claude --print
+try:
+    from wrapper.drivers.claude_cli import ClaudeCLIDriver
+except ImportError:
+    print("Claude Driver not ready yet (ImportError). Waiting for Antigravity.", file=sys.stderr)
+    sys.exit(1)
+
+async def main():
+    prompt = sys.stdin.read().strip()
+    if not prompt: return
+
+    driver = ClaudeCLIDriver()
+    await driver.start()
+    async for chunk in driver.chat(prompt, stop_tokens=[]):
+        print(chunk, end="", flush=True)
+    await driver.stop()
+
+if __name__ == "__main__":
+    asyncio.run(main())

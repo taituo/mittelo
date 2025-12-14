@@ -1,0 +1,4 @@
+{"prompt": "Gemini: Design a Python class for a 'RateLimiter' that uses a token bucket algorithm."}
+{"prompt": "Claude: Implement the 'RateLimiter' class in Python based on token bucket logic."}
+{"prompt": "Kimi: Write pytest unit tests for a 'RateLimiter' class (methods: allow_request, refill)."}
+{"prompt": "Kiro: Audit the concept of 'Token Bucket' for potential DoS vulnerabilities."}

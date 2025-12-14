@@ -4,9 +4,11 @@ import sys
 from pathlib import Path
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+project_root = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(project_root / "src"))
 
-from mittelo.backends import resolve_backend_argv, Backend, run_backend
+from wrapper.backends import resolve_backend_argv, Backend, run_backend
 
 def main():
     print("Verifying Tmux Backend Integration...")

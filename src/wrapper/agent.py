@@ -62,4 +62,4 @@ def run_agent(
         if once:
             return 0
         if not did_any:
-            time.sleep(0.25)
+            time.sleep(1.0)

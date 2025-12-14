@@ -1,29 +1,27 @@
 #!/usr/bin/env python3
 import sys
-import time
+import os
+import asyncio
 
-# CODEX DEV WRAPPER
-# Reads from stdin, formats a structured response to stdout.
+# Path fix
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, os.path.join(project_root, "src"))
 
-def main():
-    # 1. Read the incoming message (from Gemini/Hub)
-    incoming_msg = sys.stdin.read().strip()
+try:
+    from wrapper.drivers.codex_cli import CodexCLIDriver
+except ImportError:
+    print("Codex Driver not ready yet (ImportError). Waiting for Antigravity.", file=sys.stderr)
+    sys.exit(1)
 
-    # 2. Simulate processing (Codex is thoughtful)
-    # Simulate LLM latency (1.5 to 3.0 seconds)
-    import random
-    time.sleep(random.uniform(1.5, 3.0))
+async def main():
+    prompt = sys.stdin.read().strip()
+    if not prompt: return
 
-    # 3. Formulate response
-    # In a real scenario, this would call OpenAI API.
-    # For dev comms, we simulate the persona.
-    response = f"""
-[CODEX_SYSTEM] Message received.
-Context: Development/Handover
-Input: "{incoming_msg}"
-Status: Acknowledged. Ready for structural reorganization.
-"""
-    print(response.strip())
+    driver = CodexCLIDriver()
+    await driver.start()
+    async for chunk in driver.chat(prompt, stop_tokens=[]):
+        print(chunk, end="", flush=True)
+    await driver.stop()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

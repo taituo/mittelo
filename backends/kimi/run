@@ -3,21 +3,21 @@ import sys
 import os
 import asyncio
 
-# Path fix for src/ import
+# Path fix
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 sys.path.insert(0, os.path.join(project_root, "src"))
 
 try:
-    from wrapper.drivers.gemini_cli import GeminiCLIDriver
+    from wrapper.drivers.kimi_cli import KimiCLIDriver
 except ImportError:
-    print("Gemini Driver not ready yet (ImportError). Waiting for Antigravity.", file=sys.stderr)
+    print("Kimi Driver not ready yet (ImportError). Waiting for Antigravity.", file=sys.stderr)
     sys.exit(1)
 
 async def main():
     prompt = sys.stdin.read().strip()
     if not prompt: return
-    
-    driver = GeminiCLIDriver()
+
+    driver = KimiCLIDriver()
     await driver.start()
     async for chunk in driver.chat(prompt, stop_tokens=[]):
         print(chunk, end="", flush=True)

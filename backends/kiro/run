@@ -1,26 +1,27 @@
 #!/usr/bin/env python3
 import sys
-import time
-import random
+import os
+import asyncio
 
-# KIRO DEV WRAPPER (Free Tier)
-# Fast, concise, reads stdin -> stdout.
+# Path fix
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, os.path.join(project_root, "src"))
 
-def main():
-    # 1. Read input
-    incoming_msg = sys.stdin.read().strip()
+try:
+    from wrapper.drivers.kiro_cli import KiroCLIDriver
+except ImportError:
+    print("Kiro Driver not ready yet (ImportError). Waiting for Antigravity.", file=sys.stderr)
+    sys.exit(1)
 
-    # 2. No sleep, Kiro is fast (and maybe cuts corners)
-    # Just a tiny micro-latency
-    time.sleep(random.uniform(0.05, 0.2))
+async def main():
+    prompt = sys.stdin.read().strip()
+    if not prompt: return
 
-    # Simulate random failure (20% chance)
-    if random.random() < 0.2:
-        print("kiro@free-tier: CONNECTION RESET BY PEER (simulated)", file=sys.stderr)
-        sys.exit(1)
-    
-    # 3. Output response
-    print(f"kiro@free-tier: Got it. '{incoming_msg}' processed. Waiting for next cmd.")
+    driver = KiroCLIDriver()
+    await driver.start()
+    async for chunk in driver.chat(prompt, stop_tokens=[]):
+        print(chunk, end="", flush=True)
+    await driver.stop()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

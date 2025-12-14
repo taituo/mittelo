@@ -1,67 +1,53 @@
-# Backends (Gemini / Claude Code / Kiro / Codex / local OSS LLMs)
+# Backends (Gemini / Claude Code / Kiro / Codex / Kimi)
 
-Mittelö agents can use any “backend” that turns a **prompt → stdout**.
+Mittelö agents can use any "backend" that turns a **prompt → stdout**.
 
-Preferred way: `backends/<name>/run` wrappers (remix-friendly).
+## verified Solo Run Commands
 
-Backend contract:
-- read prompt from `stdin`
-- print final answer to `stdout`
-- avoid interactive UI/banners if possible
-- exit `0` on success; non-zero on failure (write details to `stderr`)
+Use these commands to verify backends in isolation (no hub required).
 
-Out of the box:
-- `echo`: returns `echo:<prompt>`
-- `shell`: runs an external command and sends the prompt to stdin
-
-## Shell backend examples
-
-### Kiro CLI (example)
-
+### Gemini
 ```bash
-python3 -m mittelo agent --backend shell --shell-cmd "kiro-cli chat --no-interactive --wrap never"
+export MITTELO_GEMINI_MODEL="gemini-2.0-flash-exp"
+python3 -m mittelo agent --backend gemini --once
+# Or raw driver:
+# gemini "hello" --model gemini-2.0-flash-exp
 ```
 
-If Kiro times out immediately, check `kiro-cli` settings (example):
-
+### Claude Code
 ```bash
-kiro-cli settings api.timeout 300000
+export MITTELO_CLAUDE_MODEL="claude-3-5-sonnet-20241022"
+python3 -m mittelo agent --backend claude_code --once
+# Raw:
+# claude "hello" --print --tools "" --model ...
 ```
 
-### Gemini CLI (example)
-
+### Kiro CLI
 ```bash
-python3 -m mittelo agent --backend shell --shell-cmd "npx -y @google/gemini-cli@nightly chat"
+export MITTELO_KIRO_MODEL="haiku"
+python3 -m mittelo agent --backend kiro --once
+# Raw:
+# kiro-cli chat --no-interactive --model haiku "hello"
 ```
 
-### Claude Code (example)
-
-Wrap whatever “Claude Code” command you use behind a backend. Example with `shell`:
-
+### Codex CLI
 ```bash
-python3 -m mittelo agent --backend shell --shell-cmd "claude --print"
+export MITTELO_CODEX_MODEL="gpt-4o"
+python3 -m mittelo agent --backend codex --once
+# Raw:
+# codex --ask-for-approval never --sandbox workspace-write exec - < input.txt
 ```
 
-### Local Ollama (example)
-
+### Kimi CLI
 ```bash
-python3 -m mittelo agent --backend shell --shell-cmd "ollama run llama3.1"
+export MITTELO_KIMI_MODEL="kimi-for-coding"
+python3 -m mittelo agent --backend kimi --once
+# Raw:
+# kimi --model kimi-for-coding --print --query "hello"
 ```
 
-## Remix-friendly backend convention
-
-If you want to keep backends as folders (easy to fork/remix), use:
-
-```
-backends/<name>/run
-```
-
-Where `run` reads the prompt from stdin and prints the result to stdout.
-
-Mittelö will auto-detect these wrappers when you run:
-
-```bash
-python3 -m mittelo agent --backend <name>
-```
-
-You can also point at another directory with `MITTELO_BACKENDS_DIR=/path/to/backends`.
+## Backend Contract
+- Read prompt from `stdin` (or argument if safe).
+- Print final answer to `stdout`.
+- Exit `0` on success.
+- Write errors to `stderr`.
