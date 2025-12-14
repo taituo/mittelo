@@ -65,6 +65,7 @@ If you want to keep backends elsewhere, set `MITTELO_BACKENDS_DIR=/path/to/backe
 - `docs/SHARE_THIS.md` (onboarding checklist)
 - `docs/AGENT_PROMPTS.md` (multi-agent dev prompts)
 - `docs/DEVELOPING_MITTELO_OUTSIDE_SWARM.md` (solo dev workflow)
+- `docs/WORKSPLIT.md` (two-agent work split)
 
 ## Verification (recommended)
 
