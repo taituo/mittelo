@@ -22,6 +22,7 @@ The repo uses env vars so you can force models without editing code:
 - `MITTELO_KIRO_MODEL` (kiro-cli `--model`)
 - `MITTELO_CODEX_MODEL` (codex `--model`)
 - `MITTELO_KIMI_MODEL` (kimi `--model`, supports `kimi2-*` models)
+- `MITTELO_MLX_MODEL` (mlx-lm `--model`)
 - `MITTELO_KIRO_TRUST_ALL_TOOLS=1` to enable `--trust-all-tools` (default is trust none)
 
 ## Verified Solo Runs (Dec 2025)

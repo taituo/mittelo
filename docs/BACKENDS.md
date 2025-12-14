@@ -47,11 +47,18 @@ python3 -m mittelo agent --backend codex --once
 # codex --ask-for-approval never --sandbox workspace-write exec - < input.txt
 ```
 
+### MLX (Apple Silicon)
+```bash
+# Requires mlx-lm installed
+export MITTELO_MLX_MODEL="mlx-community/Qwen2.5-1.5B-Instruct-4bit"
+python3 -m mittelo agent --backend mlx --once
+```
+
 ### Kimi CLI (example)
 
 ```bash
-# Requires MITTELO_KIMI_MODEL env var or defaults to kimi-for-coding
-# For Kimi2 models, set MITTELO_KIMI_MODEL=kimi2-preview (or similar)
+export MITTELO_KIMI_MODEL="kimi-for-coding"
+# For Kimi2 models, set MITTELO_KIMI_MODEL=kimi2-... (per your account/CLI)
 python3 -m mittelo agent --backend kimi --once
 # Raw:
 # kimi --model kimi-for-coding --print --query "hello"

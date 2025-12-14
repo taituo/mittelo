@@ -1,0 +1,30 @@
+#!/usr/bin/env python3
+from __future__ import annotations
+
+import asyncio
+import os
+import sys
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+sys.path.insert(0, os.path.join(project_root, "src"))
+
+from wrapper.drivers.mlx_cli import MlxCLIDriver  # noqa: E402
+
+
+async def main() -> int:
+    prompt = sys.stdin.read().strip()
+    if not prompt:
+        return 0
+
+    driver = MlxCLIDriver(model=os.environ.get("MITTELO_MLX_MODEL"))
+    await driver.start()
+    try:
+        async for chunk in driver.chat(prompt, stop_tokens=[]):
+            print(chunk, end="", flush=True)
+    finally:
+        await driver.stop()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(asyncio.run(main()))
