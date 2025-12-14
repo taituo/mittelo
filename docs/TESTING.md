@@ -37,3 +37,13 @@ Example:
 ```bash
 python3 scripts/run_system_tests.py --backend gemini --prompt "Say hello"
 ```
+
+## 4) Pair smoke (artifact-based)
+
+Pair smoke starts a hub + two agents and enqueues a small batch, writing artifacts under `reports/swarm/...`.
+
+```bash
+python3 scripts/run_pair_smoke.py --backend-a echo --backend-b echo --tasks 6 --timeout-s 15
+```
+
+If your environment cannot bind localhost sockets, the run will be recorded as `SKIPPED`.

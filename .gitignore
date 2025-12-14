@@ -23,3 +23,6 @@ reports/e2e/
 stdout.txt
 stderr.txt
 reports/swarm/
+
+# Local scratch scripts/tests
+test_resolve_backend_argv.py
