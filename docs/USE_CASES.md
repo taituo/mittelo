@@ -23,3 +23,4 @@ See `examples/use_cases/` for more:
 - `examples/use_cases/doc_pack.jsonl`
 - `examples/use_cases/code_review_pack.jsonl`
 - `examples/use_cases/repo_audit_pack.jsonl`
+- `examples/use_cases/kiro_no_tools_hard_pack.jsonl` (hard prompts, explicitly no-tools)

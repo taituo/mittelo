@@ -13,3 +13,4 @@ Packs:
 - `doc_pack.jsonl`: documentation drafting tasks
 - `code_review_pack.jsonl`: checklists and risk mitigation prompts
 - `repo_audit_pack.jsonl`: repo audit + CI planning prompts
+- `kiro_no_tools_hard_pack.jsonl`: “no tools” hard prompts (safe for Kiro without trust-all-tools)
