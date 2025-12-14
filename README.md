@@ -55,6 +55,7 @@ If you want to keep backends elsewhere, set `MITTELO_BACKENDS_DIR=/path/to/backe
 - `docs/VERSION_LOCK.md` (pin CLI flags/versions)
 - `docs/FEATURE_BUNDLES.md` (ship features as stories+docs+tests)
 - `docs/TESTING.md` (unit/integration/system tests)
+- `docs/TROUBLESHOOTING.md` (common issues)
 - `docs/SHARE_THIS.md` (onboarding checklist)
 - `docs/AGENT_PROMPTS.md` (multi-agent dev prompts)
 
