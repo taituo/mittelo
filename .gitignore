@@ -27,3 +27,6 @@ reports/swarm/
 
 # Local scratch scripts/tests
 test_resolve_backend_argv.py
+
+# Local CLI sandbox homes (created by verify scripts)
+reports/verify_cli_drivers/
