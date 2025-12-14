@@ -1,5 +1,7 @@
 # Mittelö (SwarmKit)
 
+![Mittelö](assets/mittelo.png)
+
 Mittelö (“mittelo”) is a small, remix-friendly swarm toolkit: a **hub** queues tasks and multiple **agents** (Codex, Gemini, Kiro, local OSS LLMs, or anything that can read/write stdin/stdout) lease tasks, produce results, and ack them back.
 
 ## Quick start (no LLM, just echo)
