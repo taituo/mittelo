@@ -1,0 +1,5 @@
+{"prompt": "Analyze mittelo/hub.py for thread safety issues in TaskStore access."}
+{"prompt": "Generate a pytest unit test for mittelo.backends.resolve_backend_argv."}
+{"prompt": "Review examples/stress_test.jsonl and suggest 5 new edge case scenarios."}
+{"prompt": "Draft a README section explaining the difference between 'lease' and 'ack'."}
+{"prompt": "Check mittelo/agent.py:run_agent loop for potential CPU busy-waiting optimization."}

@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+import os
+import sys
+import subprocess
+import time
+
+def main():
+    # 1. Get target session from env or default
+    target_session = os.environ.get("MITTELO_TMUX_SESSION", "mittelo_default")
+    
+    # 2. Read prompt from stdin
+    prompt = sys.stdin.read().strip()
+    if not prompt:
+        # If no prompt, just return current state
+        pass
+    else:
+        # 3. Send keys to tmux
+        # We assume the session exists. If not, maybe create it?
+        # For now, let's assume it exists or we fail.
+        
+        # Check if session exists
+        check = subprocess.run(["tmux", "has-session", "-t", target_session], capture_output=True)
+        if check.returncode != 0:
+            # Create it if it doesn't exist
+            subprocess.run(["tmux", "new-session", "-d", "-s", target_session], check=True)
+        
+        # Send the command
+        # We use -l to send literally, preventing some interpretation, but Enter needs to be separate
+        subprocess.run(["tmux", "send-keys", "-t", target_session, prompt, "Enter"], check=True)
+        
+        # Wait a bit for output to appear
+        # This is the "dirty" part of tmux wrapping. 
+        # Ideally we'd wait for a prompt, but we don't know what the prompt is.
+        time.sleep(0.5)
+
+    # 4. Capture pane
+    # -p prints to stdout
+    subprocess.run(["tmux", "capture-pane", "-p", "-t", target_session], check=True)
+
+if __name__ == "__main__":
+    main()

@@ -78,6 +78,10 @@ class JsonlHubHandler(socketserver.StreamRequestHandler):
         if method == "stats":
             return {"stats": state.store.stats()}
 
+        if method == "retry_failed":
+            count = state.store.retry_all_failed()
+            return {"retried": count}
+
         if method == "shutdown":
             state.request_shutdown()
             return {"ok": True}

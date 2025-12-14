@@ -134,6 +134,22 @@ class TaskStore:
                 out[str(r["status"])] = int(r["n"])
             return out
 
+    def retry_all_failed(self) -> int:
+        now = time.time()
+        with self._lock:
+            cur = self._db.cursor()
+            cur.execute(
+                """
+                UPDATE tasks
+                SET status='queued', updated_at=?, leased_until=NULL, worker_id=NULL, result=NULL, error=NULL
+                WHERE status='failed'
+                """,
+                (now,),
+            )
+            count = cur.rowcount
+            self._db.commit()
+            return count
+
     @staticmethod
     def _row_to_task(row: sqlite3.Row) -> Task:
         return Task(

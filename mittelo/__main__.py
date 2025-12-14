@@ -8,9 +8,11 @@ from pathlib import Path
 import subprocess
 import signal
 
-from .agent import run_agent
-from .client import JsonlClient
-from .hub import run_hub
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
+
+from wrapper.agent import run_agent
+from wrapper.client import JsonlClient
+from orchestrator.server import run_hub
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
@@ -40,6 +42,10 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     stats = sub.add_parser("stats", help="Show aggregated stats")
     stats.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
     stats.add_argument("--port", type=int, default=int(os.environ.get("MITTELO_PORT", "8765")))
+
+    retry = sub.add_parser("retry", help="Retry all failed tasks")
+    retry.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
+    retry.add_argument("--port", type=int, default=int(os.environ.get("MITTELO_PORT", "8765")))
 
     agent = sub.add_parser("agent", help="Run an agent that leases and executes tasks")
     agent.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
@@ -116,6 +122,13 @@ def _cmd_stats(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_retry(args: argparse.Namespace) -> int:
+    with JsonlClient(args.host, args.port) as c:
+        res = c.call("retry_failed", {})
+    print(f"Retried {res['retried']} tasks.")
+    return 0
+
+
 def _cmd_agent(args: argparse.Namespace) -> int:
     return run_agent(
         host=args.host,
@@ -186,6 +199,7 @@ def _cmd_swarm(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    print("DEBUG: main() started", file=sys.stderr)
     args = _parse_args(sys.argv[1:] if argv is None else argv)
     if args.cmd == "hub":
         return _cmd_hub(args)
@@ -195,6 +209,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_status(args)
     if args.cmd == "stats":
         return _cmd_stats(args)
+    if args.cmd == "retry":
+        return _cmd_retry(args)
     if args.cmd == "agent":
         return _cmd_agent(args)
     if args.cmd == "swarm":
