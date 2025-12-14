@@ -45,22 +45,16 @@ If you want to keep backends elsewhere, set `MITTELO_BACKENDS_DIR=/path/to/backe
 
 - `docs/PROTOCOL.md` (JSONL RPC protocol)
 - `docs/BACKENDS.md` (how to plug in Codex/Gemini/Kiro/local)
-- `docs/REMIX.md` (how to remix the repo)
-- `docs/QUICKSTART.md` (copy-paste commands)
+- `docs/MLX_GUIDE.md` (Apple Silicon setup)
 - `docs/STRUCTURE.md` (repo layout)
 - `docs/USE_CASES.md` (example patterns)
-- `docs/GAIA_REMIX.md` (composition recipe)
-- `docs/GO_PORT.md` (Go skeleton client)
 - `docs/REST_API.md` (optional REST adapter)
 - `docs/VERSION_LOCK.md` (pin CLI flags/versions)
-- `docs/FEATURE_BUNDLES.md` (ship features as stories+docs+tests)
 - `docs/FEATURES.md` (real vs mock/stub features)
 - `docs/TESTING.md` (unit/integration/system tests)
 - `docs/COVERAGE.md` (test coverage how-to)
 - `docs/DEAD_CODE.md` (unused/unfinished code map)
 - `docs/TROUBLESHOOTING.md` (common issues)
-- `docs/SHARE_THIS.md` (onboarding checklist)
-- `docs/AGENT_PROMPTS.md` (multi-agent dev prompts)
 
 ## Verification (recommended)
 

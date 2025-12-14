@@ -1,9 +1,12 @@
-import subprocess
+from __future__ import annotations
+
 import os
-import re
-import sys # <-- Added this import
+import subprocess
 from typing import AsyncGenerator, List
+
 from .abstract import AbstractDriver
+from .subprocess_env import build_env
+
 
 class CodexCLIDriver(AbstractDriver):
     def __init__(self, binary_path: str = "codex"):
@@ -12,8 +15,8 @@ class CodexCLIDriver(AbstractDriver):
 
     async def start(self) -> None:
         try:
-            subprocess.run([self.binary_path, "--version"], capture_output=True, check=True)
-        except (subprocess.CalledProcessError, FileNotFoundError):
+            subprocess.run([self.binary_path, "--version"], capture_output=True, text=True, check=False, env=build_env())
+        except FileNotFoundError:
             raise RuntimeError(f"Codex CLI binary '{self.binary_path}' not found or not working.")
 
 
@@ -34,22 +37,18 @@ class CodexCLIDriver(AbstractDriver):
         # Use '-' to read from stdin to avoid argv length limits
         cmd.extend(["exec", "-"])
 
-        try:
-            process = subprocess.run(
-                cmd,
-                input=content,  # Pass content via stdin
-                capture_output=True,
-                text=True,
-                check=False
-            )
-            
-            if process.returncode != 0:
-                yield f"Error: {(process.stderr or process.stdout).strip()}"
-            else:
-                yield process.stdout.strip()
-
-        except Exception as e:
-            yield f"Exception running Codex: {e}"
+        process = subprocess.run(
+            cmd,
+            input=content,
+            capture_output=True,
+            text=True,
+            check=False,
+            env=build_env(),
+        )
+        if process.returncode != 0:
+            msg = (process.stderr or process.stdout or "").strip()
+            raise RuntimeError(msg or "codex failed")
+        yield (process.stdout or "").strip()
 
     async def stop(self) -> None:
         pass

@@ -17,6 +17,12 @@ def _run_backend(backend: str, prompt: str) -> dict[str, object]:
     if not run_path.exists():
         return {"backend": backend, "ok": False, "error": f"backend not found: {run_path}"}
 
+    # Redirect external CLI home/config into the run artifact folder (best-effort).
+    # This avoids failures in sandboxed environments where writing to the real HOME is blocked.
+    env = os.environ.copy()
+    # Caller sets MITTELO_SUBPROCESS_HOME via env before invoking, but keep a default.
+    env.setdefault("MITTELO_SUBPROCESS_HOME", str(Path.cwd() / ".mittelo_home" / backend))
+
     start = time.time()
     p = subprocess.run(
         [str(run_path)],
@@ -24,6 +30,7 @@ def _run_backend(backend: str, prompt: str) -> dict[str, object]:
         capture_output=True,
         text=True,
         check=False,
+        env=env,
     )
     dur_ms = int((time.time() - start) * 1000)
     ok = p.returncode == 0
@@ -47,6 +54,9 @@ def main(argv: list[str] | None = None) -> int:
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = Path(args.out_dir) if args.out_dir else Path("reports") / "e2e" / f"{ts}_{args.backend}"
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Per-run home for external CLIs (prevents writing to real ~/.config in sandboxes)
+    os.environ["MITTELO_SUBPROCESS_HOME"] = str(out_dir / "home")
 
     run = {
         "backend": args.backend,

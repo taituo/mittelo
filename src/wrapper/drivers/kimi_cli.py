@@ -1,7 +1,11 @@
-import subprocess
+from __future__ import annotations
+
 import os
+import subprocess
 from typing import AsyncGenerator, List
 from .abstract import AbstractDriver
+from .subprocess_env import build_env
+
 
 class KimiCLIDriver(AbstractDriver):
     def __init__(self, binary_path: str = "/Users/tiny/.local/bin/kimi"):
@@ -30,7 +34,7 @@ class KimiCLIDriver(AbstractDriver):
     async def chat(self, content: str, stop_tokens: List[str]) -> AsyncGenerator[str, None]:
         """Run kimi with content."""
         
-        env = os.environ.copy()
+        env = build_env()
         if self.api_key:
             env["KIMI_API_KEY"] = self.api_key # Some CLIs use this
             # Also try MOONSHOT_API_KEY as generic fallback
@@ -57,16 +61,12 @@ class KimiCLIDriver(AbstractDriver):
             )
             
             if process.returncode != 0:
-                err_msg = process.stderr.strip() or process.stdout.strip()
-                if "LLM not set" in err_msg:
-                     yield "[KIMI CONFIG ERROR] Please run 'kimi' in terminal once to select default model."
-                else:
-                     yield f"Error: {err_msg}"
-            else:
-                yield process.stdout
+                err_msg = (process.stderr or process.stdout or "").strip()
+                raise RuntimeError(err_msg or "kimi failed")
+            yield process.stdout or ""
 
-        except Exception as e:
-            yield f"Exception running kimi: {e}"
+        except Exception:
+            raise
 
     async def stop(self) -> None:
         pass
