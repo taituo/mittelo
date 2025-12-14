@@ -72,7 +72,8 @@ class JsonlHubHandler(socketserver.StreamRequestHandler):
 
         if method == "list":
             status = params.get("status")
-            limit = int(params.get("limit") or 50)
+            limit_param = params.get("limit")
+            limit = int(limit_param) if limit_param is not None else 50
             tasks = state.store.list(status=status, limit=limit)
             return {"tasks": [asdict(t) for t in tasks], "stats": state.store.stats()}
 

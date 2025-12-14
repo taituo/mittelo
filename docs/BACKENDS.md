@@ -38,9 +38,11 @@ python3 -m mittelo agent --backend codex --once
 # codex --ask-for-approval never --sandbox workspace-write exec - < input.txt
 ```
 
-### Kimi CLI
+### Kimi CLI (example)
+
 ```bash
-export MITTELO_KIMI_MODEL="kimi-for-coding"
+# Requires MITTELO_KIMI_MODEL env var or defaults to kimi-for-coding
+# For Kimi2 models, set MITTELO_KIMI_MODEL=kimi2-preview (or similar)
 python3 -m mittelo agent --backend kimi --once
 # Raw:
 # kimi --model kimi-for-coding --print --query "hello"
