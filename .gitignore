@@ -18,6 +18,7 @@ go/*.exe
 
 # System-run artifacts (generated, non-deterministic)
 reports/e2e/
+reports/coverage/
 
 # Local scratch outputs
 stdout.txt
