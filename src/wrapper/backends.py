@@ -49,6 +49,15 @@ def resolve_backend_argv(name: str) -> list[str] | None:
             if run_path.suffix == ".py":
                 return [sys.executable, str(run_path)]
             if os.access(run_path, os.X_OK):
+                # If the executable is a python script, prefer the current interpreter
+                # (so running the agent from a venv also runs the backend from that venv).
+                try:
+                    first = run_path.read_text(encoding="utf-8", errors="replace").splitlines()[:1]
+                    if first and first[0].startswith("#!") and "python" in first[0]:
+                        return [sys.executable, str(run_path)]
+                except Exception:
+                    pass
+            if os.access(run_path, os.X_OK):
                 return [str(run_path)]
             return ["bash", str(run_path)]
     return None

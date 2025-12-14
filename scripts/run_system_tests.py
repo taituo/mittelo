@@ -5,6 +5,7 @@ import argparse
 import json
 import os
 import subprocess
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -17,6 +18,14 @@ def _run_backend(backend: str, prompt: str) -> dict[str, object]:
     if not run_path.exists():
         return {"backend": backend, "ok": False, "error": f"backend not found: {run_path}"}
 
+    argv = [str(run_path)]
+    try:
+        first = run_path.read_text(encoding="utf-8", errors="replace").splitlines()[:1]
+        if first and first[0].startswith("#!") and "python" in first[0]:
+            argv = [sys.executable, str(run_path)]
+    except Exception:
+        pass
+
     # Redirect external CLI home/config into the run artifact folder (best-effort).
     # This avoids failures in sandboxed environments where writing to the real HOME is blocked.
     env = os.environ.copy()
@@ -25,7 +34,7 @@ def _run_backend(backend: str, prompt: str) -> dict[str, object]:
 
     start = time.time()
     p = subprocess.run(
-        [str(run_path)],
+        argv,
         input=prompt,
         capture_output=True,
         text=True,
