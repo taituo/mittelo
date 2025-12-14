@@ -58,6 +58,16 @@ If you want to keep backends elsewhere, set `MITTELO_BACKENDS_DIR=/path/to/backe
 - `docs/SHARE_THIS.md` (onboarding checklist)
 - `docs/AGENT_PROMPTS.md` (multi-agent dev prompts)
 
+## Verification (recommended)
+
+```bash
+python3 scripts/doctor.py
+pytest
+python3 scripts/run_pair_smoke.py --backend-a echo --backend-b echo --tasks 6 --timeout-s 15
+```
+
+Pair smoke writes artifacts under `reports/swarm/...` and may record `SKIPPED` if localhost socket binding is blocked.
+
 ## Contributing
 
 See `CONTRIBUTING.md`.
