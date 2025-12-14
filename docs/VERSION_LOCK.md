@@ -24,6 +24,40 @@ The repo uses env vars so you can force models without editing code:
 - `MITTELO_KIMI_MODEL` (kimi `--model`, supports `kimi2-*` models)
 - `MITTELO_KIRO_TRUST_ALL_TOOLS=1` to enable `--trust-all-tools` (default is trust none)
 
+## Verified Solo Runs (Dec 2025)
+
+The following commands have been verified to work non-interactively on this machine.
+
+### Gemini
+```bash
+export MITTELO_GEMINI_MODEL="gemini-2.0-flash-exp"
+python3 -m mittelo agent --backend gemini --once
+```
+
+### Claude Code
+```bash
+export MITTELO_CLAUDE_MODEL="claude-3-5-sonnet-20241022"
+python3 -m mittelo agent --backend claude_code --once
+```
+
+### Kiro CLI
+```bash
+export MITTELO_KIRO_MODEL="haiku"
+python3 -m mittelo agent --backend kiro --once
+```
+
+### Codex CLI
+```bash
+export MITTELO_CODEX_MODEL="gpt-4o"
+python3 -m mittelo agent --backend codex --once
+```
+
+### Kimi CLI
+```bash
+export MITTELO_KIMI_MODEL="kimi-for-coding"
+python3 -m mittelo agent --backend kimi --once
+```
+
 ## Known CLIs (this machine, Dec 2025)
 
 These were observed in this repo/workspace:
