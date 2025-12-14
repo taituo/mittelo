@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 import subprocess
 from typing import AsyncGenerator, List
 
@@ -25,6 +26,14 @@ class KiroCLIDriver(AbstractDriver):
         if self.model:
             cmd.extend(["--model", self.model])
 
+        work_dir = os.environ.get("MITTELO_SUBPROCESS_WORKDIR")
+        if not work_dir and self.trust_all_tools:
+            # When tools are auto-approved, prevent accidental writes to the repo root by default.
+            work_dir = str(Path.cwd() / ".mittelo" / "work" / "kiro")
+        if work_dir:
+            Path(work_dir).mkdir(parents=True, exist_ok=True)
+            cmd.extend(["--work-dir", work_dir])
+
         if self.trust_all_tools:
             cmd.append("--trust-all-tools")
         else:
@@ -39,6 +48,7 @@ class KiroCLIDriver(AbstractDriver):
             text=True,
             check=False,
             env=build_env(),
+            cwd=work_dir,
         )
         if process.returncode != 0:
             msg = (process.stderr or process.stdout or "").strip()

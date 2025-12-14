@@ -47,6 +47,12 @@ python3 -m mittelo agent --backend kiro --once
 # kiro-cli chat --no-interactive --model claude-haiku-4.5 "hello"
 ```
 
+Notes:
+- If `kiro-cli login` tries to open a browser and that’s not possible in your environment, prefer device-flow and disable auto-open:
+  - `BROWSER=echo kiro-cli login --use-device-flow`
+- If you run with `MITTELO_KIRO_TRUST_ALL_TOOLS=1`, Mittelö sets a default work directory for Kiro (so tools don’t write into the repo root).
+  Override via `MITTELO_SUBPROCESS_WORKDIR=/path/to/sandbox`.
+
 ### Codex CLI
 **Prereqs:** `codex` available; authenticated.
 ```bash
