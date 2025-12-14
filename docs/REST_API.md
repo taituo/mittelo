@@ -7,7 +7,7 @@ Mittelö’s core transport is TCP JSONL (`docs/PROTOCOL.md`). For integrations 
 Run the hub with `--rest-port`:
 
 ```bash
-python3 -m mittelo hub --db mittelo.db --host 127.0.0.1 --port 8765 --rest-port 8080 --print-url
+python3 -m mittelo hub --host 127.0.0.1 --port 8765 --rest-port 8080 --print-url
 ```
 
 `--rest-host` is optional (defaults to hub host).

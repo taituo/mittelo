@@ -24,6 +24,7 @@ reports/coverage/
 stdout.txt
 stderr.txt
 reports/swarm/
+.mittelo/
 
 # Local scratch scripts/tests
 test_resolve_backend_argv.py

@@ -11,8 +11,10 @@ Manual run (3 terminals):
 Terminal A:
 
 ```bash
-python3 -m mittelo hub --db mittelo.db --host 127.0.0.1 --port 8765
+python3 -m mittelo hub --host 127.0.0.1 --port 8765
 ```
+
+By default, the hub stores its DB in `.mittelo/mittelo.db` (override via `--db` or `MITTELO_DB`).
 
 Terminal B:
 

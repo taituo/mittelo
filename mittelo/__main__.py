@@ -20,8 +20,7 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     hub = sub.add_parser("hub", help="Run hub (task queue) server")
-    default_db = os.path.expanduser("~/.mittelo/mittelo.db")
-    hub.add_argument("--db", default=default_db)
+    hub.add_argument("--db", default=os.environ.get("MITTELO_DB", ".mittelo/mittelo.db"))
     hub.add_argument("--host", default="127.0.0.1")
     hub.add_argument("--port", type=int, default=8765)
     hub.add_argument("--lease-seconds", type=int, default=60)
@@ -84,7 +83,9 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 
 def _cmd_hub(args: argparse.Namespace) -> int:
     db_path = os.path.abspath(args.db)
-    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    db_dir = os.path.dirname(db_path)
+    if db_dir and not os.path.exists(db_dir):
+        os.makedirs(db_dir, exist_ok=True)
     return run_hub(
         db_path=db_path,
         host=args.host,
