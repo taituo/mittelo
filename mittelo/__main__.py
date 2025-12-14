@@ -13,6 +13,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 from wrapper.agent import run_agent
 from wrapper.client import JsonlClient
 from orchestrator.server import run_hub
+from wrapper.prereqs import preflight_backend
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
@@ -62,6 +63,8 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     agent.add_argument("--max-tasks", type=int, default=1)
     agent.add_argument("--lease-seconds", type=int, default=60)
     agent.add_argument("--once", action="store_true")
+    agent.add_argument("--no-preflight", action="store_true", help="Skip backend prerequisite warnings")
+    agent.add_argument("--require-ready", action="store_true", help="Exit if backend is not ready")
 
     swarm = sub.add_parser("swarm", help="Spawn multiple agents (a small local swarm)")
     swarm.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
@@ -73,6 +76,12 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
         help="backend=count (repeatable), example: --agent echo=2 --agent kiro=1",
     )
     swarm.add_argument("--lease-seconds", type=int, default=60)
+    swarm.add_argument("--no-preflight", action="store_true", help="Skip backend prerequisite warnings")
+    swarm.add_argument("--require-ready", action="store_true", help="Exit if any backend is not ready")
+
+    backend_check = sub.add_parser("backend-check", help="Check backend prerequisites (best-effort)")
+    backend_check.add_argument("--backend", required=True)
+    backend_check.add_argument("--json", action="store_true")
 
     shutdown = sub.add_parser("shutdown", help="Shutdown the hub")
     shutdown.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
@@ -162,6 +171,8 @@ def _cmd_agent(args: argparse.Namespace) -> int:
         max_tasks=args.max_tasks,
         lease_seconds=args.lease_seconds,
         once=args.once,
+        preflight=not args.no_preflight,
+        require_ready=args.require_ready,
     )
 
 
@@ -183,26 +194,35 @@ def _cmd_swarm(args: argparse.Namespace) -> int:
 
     procs: list[subprocess.Popen] = []
     try:
+        if not args.no_preflight:
+            for backend, _count in specs:
+                res = preflight_backend(backend)
+                if res.status != "ok":
+                    for line in (*res.problems, *res.warnings):
+                        print(f"[{backend}] {line}", file=sys.stderr)
+                if args.require_ready and res.status != "ok":
+                    return 2
         for backend, count in specs:
             for _ in range(count):
-                procs.append(
-                    subprocess.Popen(
-                        [
-                            sys.executable,
-                            "-m",
-                            "mittelo",
-                            "agent",
-                            "--host",
-                            args.host,
-                            "--port",
-                            str(args.port),
-                            "--backend",
-                            backend,
-                            "--lease-seconds",
-                            str(args.lease_seconds),
-                        ]
-                    )
-                )
+                argv = [
+                    sys.executable,
+                    "-m",
+                    "mittelo",
+                    "agent",
+                    "--host",
+                    args.host,
+                    "--port",
+                    str(args.port),
+                    "--backend",
+                    backend,
+                    "--lease-seconds",
+                    str(args.lease_seconds),
+                ]
+                if args.no_preflight:
+                    argv.append("--no-preflight")
+                if args.require_ready:
+                    argv.append("--require-ready")
+                procs.append(subprocess.Popen(argv))
         for p in procs:
             p.wait()
     except KeyboardInterrupt:
@@ -239,6 +259,18 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_agent(args)
     if args.cmd == "swarm":
         return _cmd_swarm(args)
+    if args.cmd == "backend-check":
+        res = preflight_backend(args.backend)
+        if args.json:
+            print(json.dumps({"backend": res.backend, "status": res.status, "problems": res.problems, "warnings": res.warnings}))
+        else:
+            print(f"backend: {res.backend}")
+            print(f"status: {res.status}")
+            for p in res.problems:
+                print(f"- problem: {p}")
+            for w in res.warnings:
+                print(f"- warning: {w}")
+        return 0 if res.status == "ok" else 1
     if args.cmd == "shutdown":
         return _cmd_shutdown(args)
     raise SystemExit(f"Unknown cmd: {args.cmd}")

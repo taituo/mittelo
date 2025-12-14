@@ -7,10 +7,9 @@ This guide is for working on Mittelö **without running a multi-agent swarm** (s
 1. Read:
    - `README.md`
    - `docs/STRUCTURE.md`
-   - `docs/QUICKSTART.md`
+   - `info/QUICKSTART.md` (archived)
    - `docs/TESTING.md`
    - `docs/VERSION_LOCK.md`
-   - `docs/QA_TICKETS.md`
 2. Sanity-check your environment:
    - `python3 scripts/doctor.py`
    - `pytest`
@@ -56,12 +55,16 @@ Backends are scripts under `backends/<name>/run`.
 Recommended workflow:
 1. Add/update the backend script.
 2. Verify it produces “clean stdout” (no banners, no ANSI) for simple prompts.
-3. Run the backend system test:
+3. Run a prereq check (best-effort):
+   ```bash
+   python3 -m mittelo backend-check --backend <name>
+   ```
+4. Run the backend system test:
    ```bash
    python3 scripts/run_system_tests.py --backend <name> --prompt "Return exactly: mittelo smoke ok"
    ```
 
-If your backend wraps an external CLI (Claude/Codex/Gemini/Kiro/Kimi):
+If your backend wraps an external CLI (Claude/Codex/Gemini/Kiro/Kimi/MLX):
 - Expect auth/config failures until the CLI is logged in and environment variables are set.
 - Prefer to ticket missing auth/config as “setup prerequisites”, not “code bugs”.
 
@@ -110,4 +113,3 @@ When you hit a failure:
   - Expected vs actual
   - Environment notes (OS, restrictions, auth state)
   - Proposed fix owner (“code”, “docs”, “setup”, “CI”)
-

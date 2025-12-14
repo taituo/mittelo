@@ -7,6 +7,7 @@ import uuid
 
 from .backends import Backend, resolve_backend_argv, run_backend
 from .client import JsonlClient
+from .prereqs import preflight_backend
 
 
 def _backend_from_name(name: str, shell_cmd: str | None) -> Backend:
@@ -34,9 +35,21 @@ def run_agent(
     max_tasks: int,
     lease_seconds: int,
     once: bool,
+    preflight: bool,
+    require_ready: bool,
 ) -> int:
     worker = worker_id or f"{socket.gethostname()}-{os.getpid()}-{uuid.uuid4().hex[:8]}"
     backend_obj = _backend_from_name(backend, shell_cmd=shell_cmd)
+
+    if preflight and backend_obj.name not in {"echo", "shell"}:
+        res = preflight_backend(backend_obj.name)
+        if res.status != "ok":
+            import sys
+
+            for line in (*res.problems, *res.warnings):
+                print(f"[{backend_obj.name}] {line}", file=sys.stderr)
+        if res.status == "fail" or (require_ready and res.status != "ok"):
+            return 2
 
     while True:
         did_any = False
