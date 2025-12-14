@@ -8,6 +8,7 @@ from dataclasses import asdict
 from typing import Any
 
 from .storage import TaskStore
+from .rest_api import RestApiServer
 
 
 class _HubState:
@@ -94,19 +95,40 @@ class ThreadedTcpServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     allow_reuse_address = True
 
 
-def run_hub(db_path: str, host: str, port: int, lease_seconds: int, print_url: bool) -> int:
+def run_hub(
+    db_path: str,
+    host: str,
+    port: int,
+    lease_seconds: int,
+    print_url: bool,
+    rest_host: str | None = None,
+    rest_port: int | None = None,
+) -> int:
     store = TaskStore(db_path)
     state = _HubState(store, lease_seconds=lease_seconds)
+    rest: RestApiServer | None = None
 
     with ThreadedTcpServer((host, port), JsonlHubHandler) as srv:
         srv.state = state  # type: ignore[attr-defined]
         actual_host, actual_port = srv.server_address
         if print_url:
             print(f"MITTELO_HUB tcp://{actual_host}:{actual_port}", flush=True)
+
+        if rest_port is not None and rest_port != 0:
+            rest = RestApiServer(rest_host or actual_host, rest_port, state)
+            rest.start()
+            if print_url:
+                rh, rp = rest.address
+                print(f"MITTELO_REST http://{rh}:{rp}", flush=True)
         try:
             while not state.shutdown_requested():
                 srv.handle_request()
         finally:
+            if rest is not None:
+                try:
+                    rest.stop()
+                except Exception:
+                    pass
             try:
                 store.close()
             except Exception:

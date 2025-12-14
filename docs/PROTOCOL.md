@@ -27,7 +27,13 @@ If error:
 - `ack` params: `{ "task_id": 123, "status": "done|failed", "result": "...", "error": "..." }` → result: `{ "ok": true }`
 - `list` params: `{ "status": "queued|leased|done|failed"?, "limit": 50 }` → result: `{ "tasks": [...], "stats": {...} }`
 - `stats` params: `{}` → result: `{ "stats": {...} }`
+- `retry_failed` params: `{}` → result: `{ "retried": 123 }`
 - `shutdown` params: `{}` → result: `{ "ok": true }`
+
+Notes:
+- `list.limit <= 0` means “no limit”.
+- `lease` may return tasks whose previous lease expired (they are re-leased to the new `worker_id`).
+- `retry_failed` resets failed tasks back to `queued` (clears `worker_id`, `leased_until`, `result`, `error`).
 
 Task object fields:
 

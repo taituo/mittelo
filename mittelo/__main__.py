@@ -25,6 +25,8 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     hub.add_argument("--port", type=int, default=8765)
     hub.add_argument("--lease-seconds", type=int, default=60)
     hub.add_argument("--print-url", action="store_true")
+    hub.add_argument("--rest-host", default=None, help="Optional REST host (enables REST when --rest-port is set)")
+    hub.add_argument("--rest-port", type=int, default=0, help="Optional REST port (0 disables REST)")
 
     enqueue = sub.add_parser("enqueue", help="Enqueue a task prompt")
     enqueue.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
@@ -46,6 +48,10 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
     retry = sub.add_parser("retry", help="Retry all failed tasks")
     retry.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
     retry.add_argument("--port", type=int, default=int(os.environ.get("MITTELO_PORT", "8765")))
+
+    dashboard = sub.add_parser("dashboard", help="Launch TUI Mission Control")
+    dashboard.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
+    dashboard.add_argument("--port", type=int, default=int(os.environ.get("MITTELO_PORT", "8765")))
 
     agent = sub.add_parser("agent", help="Run an agent that leases and executes tasks")
     agent.add_argument("--host", default=os.environ.get("MITTELO_HOST", "127.0.0.1"))
@@ -82,6 +88,8 @@ def _cmd_hub(args: argparse.Namespace) -> int:
         port=args.port,
         lease_seconds=args.lease_seconds,
         print_url=args.print_url,
+        rest_host=args.rest_host,
+        rest_port=args.rest_port,
     )
 
 
@@ -126,6 +134,17 @@ def _cmd_retry(args: argparse.Namespace) -> int:
     with JsonlClient(args.host, args.port) as c:
         res = c.call("retry_failed", {})
     print(f"Retried {res['retried']} tasks.")
+    return 0
+
+
+def _cmd_dashboard(args: argparse.Namespace) -> int:
+    try:
+        from utils.dashboard import run_dashboard
+    except ImportError:
+        print("Textual not installed. Run: pip install textual", file=sys.stderr)
+        return 1
+    
+    run_dashboard(args.host, args.port)
     return 0
 
 
@@ -199,7 +218,6 @@ def _cmd_swarm(args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    print("DEBUG: main() started", file=sys.stderr)
     args = _parse_args(sys.argv[1:] if argv is None else argv)
     if args.cmd == "hub":
         return _cmd_hub(args)
@@ -211,6 +229,8 @@ def main(argv: list[str] | None = None) -> int:
         return _cmd_stats(args)
     if args.cmd == "retry":
         return _cmd_retry(args)
+    if args.cmd == "dashboard":
+        return _cmd_dashboard(args)
     if args.cmd == "agent":
         return _cmd_agent(args)
     if args.cmd == "swarm":

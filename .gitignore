@@ -15,3 +15,10 @@ logs/
 
 go/mitteloctl
 go/*.exe
+
+# System-run artifacts (generated, non-deterministic)
+reports/e2e/
+
+# Local scratch outputs
+stdout.txt
+stderr.txt

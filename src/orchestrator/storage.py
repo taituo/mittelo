@@ -116,13 +116,22 @@ class TaskStore:
     def list(self, status: str | None, limit: int) -> list[Task]:
         with self._lock:
             cur = self._db.cursor()
-            if status:
-                cur.execute(
-                    "SELECT * FROM tasks WHERE status=? ORDER BY task_id DESC LIMIT ?",
-                    (status.lower().strip(), limit),
-                )
+            status_norm = status.lower().strip() if status else None
+
+            if limit <= 0:
+                if status_norm:
+                    cur.execute("SELECT * FROM tasks WHERE status=? ORDER BY task_id DESC", (status_norm,))
+                else:
+                    cur.execute("SELECT * FROM tasks ORDER BY task_id DESC")
             else:
-                cur.execute("SELECT * FROM tasks ORDER BY task_id DESC LIMIT ?", (limit,))
+                if status_norm:
+                    cur.execute(
+                        "SELECT * FROM tasks WHERE status=? ORDER BY task_id DESC LIMIT ?",
+                        (status_norm, limit),
+                    )
+                else:
+                    cur.execute("SELECT * FROM tasks ORDER BY task_id DESC LIMIT ?", (limit,))
+
             return [self._row_to_task(r) for r in cur.fetchall()]
 
     def stats(self) -> dict[str, int]:
