@@ -41,10 +41,10 @@ python3 -m mittelo agent --backend glm --once
 ### Kiro CLI
 **Prereqs:** `kiro-cli` available; may require device-flow login (`kiro-cli login --use-device-flow`).
 ```bash
-export MITTELO_KIRO_MODEL="haiku"
+export MITTELO_KIRO_MODEL="claude-haiku-4.5"
 python3 -m mittelo agent --backend kiro --once
 # Raw:
-# kiro-cli chat --no-interactive --model haiku "hello"
+# kiro-cli chat --no-interactive --model claude-haiku-4.5 "hello"
 ```
 
 ### Codex CLI

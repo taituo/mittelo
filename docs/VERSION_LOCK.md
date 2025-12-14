@@ -43,7 +43,7 @@ python3 -m mittelo agent --backend claude_code --once
 
 ### Kiro CLI
 ```bash
-export MITTELO_KIRO_MODEL="haiku"
+export MITTELO_KIRO_MODEL="claude-haiku-4.5"
 python3 -m mittelo agent --backend kiro --once
 ```
 

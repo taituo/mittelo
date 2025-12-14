@@ -28,7 +28,8 @@ class KiroCLIDriver(AbstractDriver):
         if self.trust_all_tools:
             cmd.append("--trust-all-tools")
         else:
-            cmd.extend(["--trust-tools", ""])
+            # Per `kiro-cli chat --help`: trust no tools via an empty value.
+            cmd.append("--trust-tools=")
 
         cmd.append(content)
 
